@@ -1,5 +1,5 @@
 pipeline {
-    agent none  // No hay un agente global, se define por etapa
+    agent none  // No asignamos un agente global
     options {
         skipStagesAfterUnstable()
     }
@@ -7,7 +7,8 @@ pipeline {
         stage('Build') {
             agent {
                 docker { 
-                    image 'python:3.12.0-alpine3.18'  // Imagen para la etapa de Build
+                    image 'python:3.12.0-alpine3.18'  // Usamos la imagen de Docker para esta etapa
+                    args '-v /tmp:/tmp'  // Opcionales, si necesitas más configuraciones
                 }
             }
             steps {
@@ -18,7 +19,7 @@ pipeline {
         stage('Test') {
             agent {
                 docker { 
-                    image 'qnib/pytest'  // Imagen para la etapa de Test
+                    image 'qnib/pytest'  // Usamos otra imagen para esta etapa
                 }
             }
             steps {
@@ -31,7 +32,7 @@ pipeline {
             }
         }
         stage('Deliver') {
-            agent any  // Cualquier nodo para la etapa de Deliver
+            agent any  // Usamos un agente cualquiera para esta etapa
             environment {
                 VOLUME = '$(pwd)/sources:/src'
                 IMAGE = 'cdrx/pyinstaller-linux:python2'
